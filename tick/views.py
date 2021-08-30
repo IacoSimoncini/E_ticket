@@ -312,7 +312,7 @@ def manageBuy(request,pk):
         tick+=(i,)
         tickets.append(tick)
 
-    context= {'tickets':tickets ,'id_evento':pk,'id_user':request.user.id}
+    context= {'tickets':tickets ,'id_evento':pk,'id_user':request.user.id, 'name_event': ticket.nome}
     return render(request,'tick/accounts/managebuy.html', context)
 
 @login_required(login_url='login')
@@ -347,10 +347,10 @@ def invalidateTicket(request, pk, id_evento, id_user):
 def refundTicket(request, pk, id_evento, id_user):
 
     item = (pk, id_evento, id_user, )
-    
+    event= Event.objects.get(id=id_evento)
+
     if request.method == 'POST':
         try:
-            event= Event.objects.get(id=id_evento)
             user= User.objects.get(id=id_user)
             contract_deployed=sc.deploy_contract(event.address, abi, w3)
             result =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
@@ -365,7 +365,7 @@ def refundTicket(request, pk, id_evento, id_user):
             return redirect ('/tick/error/')
         return redirect ('/tick/managebuy/' + id_evento + '/')
     
-    context = {'item': item}
+    context = {'item': item, 'event': event}
     return render(request, 'tick/accounts/confirm_ref.html', context)
     
     
