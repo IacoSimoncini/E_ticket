@@ -11,7 +11,6 @@ from django.contrib import messages
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.db.models import F
 
-
 def events(request):
     events = Event.objects.all()
     total_events = events.count()
@@ -164,7 +163,7 @@ def buyTicket (request,pk):
     if request.method == 'POST':
         ticket.num_ticket-=1
         ticket.save()
-        
+
         return redirect ('/tick/user/')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
     return render(request, 'tick/accounts/confirm.html', context)
