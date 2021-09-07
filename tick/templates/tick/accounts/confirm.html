@@ -1,0 +1,30 @@
+{% extends 'tick/common.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+    <h5>Vuoi procedere con l'acquisto di un biglietto per "{{ticket}}"?</h5>
+        <div class="card" style="width: 18rem;">
+          <img src="{{ ticket.immagine.url }}" class="card-img-top" alt="...">
+          <div class="card-body">
+            <h6 class="card-title">{{ticket.category}}</h6>
+            <h5 style="color: #bb4d3a"  class="card-title">€ {{ticket.prezzo}}</h5>
+            <h6 class="card-title">{{ticket.luogo}}</h6>
+            <p class="card-text">{{ticket.num_ticket}} ticket disponibili</p>
+          </div>
+          <form style="text-align: center;"action="{% url 'buy_ticket' ticket.id %}" method="POST">
+            {% csrf_token %}
+            <a class="btn btn-warning" href="{% url 'user-page' %}">Cancel</a>
+            <input class="btn btn-danger" type="submit" name="Confirm">
+
+        </form><br>
+        </div>
+        <br>
+
+
+
+
+
+    
+</div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'tick/common.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+<p>Are you sure you want to delete "{{item}}"?</p>
+<form action="{% url 'delete_event' item.id %}" method="POST">
+    {% csrf_token %}
+    <a class="btn btn-warning" href="{% url 'manager' %}">Cancel</a>
+    <input class="btn btn-danger" type="submit" name="Confirm">
+
+</form>
+
+</div>
+{% endblock %}

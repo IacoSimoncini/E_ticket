@@ -1,0 +1,39 @@
+{% extends 'tick/common.html' %}
+{% block content %}
+
+<br>
+
+<div class="container-fluid">
+	<div class="col-md-5">
+		<h3>Events:</h3>
+		<div class="card card-body">
+            <div>
+				<h4>Total Events: {{total_events}}</h4>
+			</div>
+			<a class="btn btn-primary  btn-sm btn-block" style="background-color:#343A40" href="{% url 'create_event' %}">Create Event</a>
+			<table class="table table-sm">
+				<tr>
+					<th>Nome</th>
+					<th>Categoria</th>
+                    <th>Prezzo</th>
+					<th>Posti</th>
+					<th>Luogo</th>
+				</tr>
+				{% for i in events %}
+					<tr>
+					<td>{{i.nome}}</td>
+					<td>{{i.category}}</td>
+					<td>{{i.prezzo}}</td>
+					<td>{{i.num_ticket}}</td>
+					<td>{{i.luogo}}</td>
+
+					<td><a  style = " color: #e91313" href="{% url 'update_event' i.id %}">Update</a></td>
+					<td><a  style = " color: #4989c9" href="{% url 'delete_event' i.id %}">Delete</a></td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>	
+	</div>
+</div>
+
+{% endblock %}
