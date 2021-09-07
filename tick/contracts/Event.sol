@@ -36,14 +36,12 @@ contract Event is Ownable{
      * @param _nameEvent string event's name
      * @param _locationEvent string event's location
      * @param _ticketPrice uint256 ticket's price
-     * @param _ticketInvalidator address seller's address
     **/
     constructor(uint256 _eventId, 
         uint256 _numTicketsAvailable, 
         string memory _nameEvent, 
         string memory _locationEvent, 
-        uint256 _ticketPrice, 
-        address _ticketInvalidator) 
+        uint256 _ticketPrice) 
     {
         numTicketsAvailable = _numTicketsAvailable;
       numTicketsTotal = _numTicketsAvailable;
@@ -52,8 +50,6 @@ contract Event is Ownable{
         locationEvent = _locationEvent;
         ticketPrice = _ticketPrice;
         deleted = false;
-        TicketsEvent tickets = new TicketsEvent(_numTicketsAvailable, _ticketPrice);
-        require(tickets.transferOwnership(_ticketInvalidator));
     }
     
     /**
