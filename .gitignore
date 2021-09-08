@@ -1,1 +1,5 @@
 .vscode/
+tick/contracts/__pycache__/
+tick/__pycache__/
+E_Ticket/__pycache__/
+tick/contracts/__pycache__
