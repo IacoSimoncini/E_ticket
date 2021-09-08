@@ -61,6 +61,21 @@ def deploy_contract(tx_receipt, abi, w3):
     )    
     return deployed_contract
 
+def create_ticket(contract_deployed,buyer,taxSeal):
+    return contract_deployed.functions.createTicket(buyer,taxSeal)
+
+def buy_ticket(contract_deployed,buyer,taxSeal):
+    return contract_deployed.functions.buyTicket(buyer,taxSeal)  
+
+def invalidation(contract_deployed,owner):
+    return contract_deployed.functions.invalidation(owner)
+
+def delete_event(contract_deployed,event_id):
+    return contract_deployed.functions.createTicket(event_id)
+
+
+
+
 def read_abi(abi_name):
     with open(abi_name) as jsonFile:
         abi = json.load(jsonFile)

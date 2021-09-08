@@ -162,6 +162,7 @@ def deleteEvent (request,pk):
     event=Event.objects.get(id=pk)
     if request.method == 'POST':
         event.delete()
+        sc.delete_event(pk)
         return redirect ('/tick/manager/')
     context={'item':event}  #item l'ho chiamato in delete.html
     return render(request, 'tick/accounts/delete.html', context)
