@@ -39,6 +39,8 @@ def hash_receipt(contract_not_deployed, w3):
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
     return tx_hash, tx_receipt
 
+
+
 def deploy_contract(tx_receipt, abi, w3):
     '''
     Deploy a contract

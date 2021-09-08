@@ -122,8 +122,12 @@ def createEvent(request):
     form = EventForm()
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
+        
         if form.is_valid():
-            form.save()
+            form.save()                       
+            tx_hash = contract_event_not_deployed.constructor(Event.objects.latest('id').id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo']).transact()
+            tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+            sc.deploy_contract(tx_receipt, abi, w3)
             return redirect ('/tick/manager/')
 
     context={'form':form}
@@ -136,7 +140,9 @@ def createEvent(request):
 def updateEvent(request, pk):
 
     event=Event.objects.get(id=pk)
+    
     form = EventForm(instance=event)
+    
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES, instance=event)
         if form.is_valid():

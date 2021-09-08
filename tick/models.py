@@ -21,6 +21,7 @@ class Event(models.Model):
 		('Sport', 'Sport'),
 		('Concerti', 'Concerti'),
 		)
+
     num_ticket = models.IntegerField() #ticket disponibili
     immagine = models.ImageField(null=True, blank=True, default='static/tick/default.jpg')
     category = models.CharField(max_length=200, null=True, choices=CATEGORY)
