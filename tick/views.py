@@ -15,7 +15,7 @@ import tick.contracts.smart_contract as sc
 w3 = sc.start_web3()
 abi = sc.read_abi("tick/contracts/abi_event.json")
 bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
-
+w3.eth.default_account = w3.eth.accounts[0]
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
 def events(request):
