@@ -10,17 +10,21 @@ from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.db.models import F
+import tick.contracts.smart_contract as sc
+
+w3 = sc.start_web3()
+abi = sc.read_abi("tick/contracts/abi_event.json")
+bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
+contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
 def events(request):
     events = Event.objects.all()
     total_events = events.count()
 
-
     film= events.filter(category='Cinema')
     sport= events.filter(category='Sport')
     teatro= events.filter(category='Teatro')
     concerti= events.filter(category='Concerti')
-
 
     context= {'events':events, 'total_events':total_events, 'film':film, 'sport':sport, 'teatro':teatro, 'concerti':concerti }
 
@@ -37,7 +41,6 @@ def userPage(request):
     sport= events.filter(category='Sport')
     teatro= events.filter(category='Teatro')
     concerti= events.filter(category='Concerti')
-
 
     context= {'events':events, 'total_events':total_events, 'film':film, 'sport':sport, 'teatro':teatro, 'concerti':concerti }
 
@@ -123,8 +126,8 @@ def createEvent(request):
             form.save()
             return redirect ('/tick/manager/')
 
-
     context={'form':form}
+
     return render(request, 'tick/accounts/create_event.html', context)
 
 
