@@ -17,6 +17,8 @@ abi = sc.read_abi("tick/contracts/abi_event.json")
 bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
+
+
 def events(request):
     events = Event.objects.all()
     total_events = events.count()
@@ -124,10 +126,10 @@ def createEvent(request):
         form = EventForm(request.POST, request.FILES)
         
         if form.is_valid():
-            form.save()                       
-            tx_hash = contract_event_not_deployed.constructor(Event.objects.latest('id').id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo']).transact()
-            tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-            sc.deploy_contract(tx_receipt, abi, w3)
+            
+            form=form.save()    
+            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])
+            contract_event=sc.deploy_contract(tx_receipt, abi, w3)
             return redirect ('/tick/manager/')
 
     context={'form':form}
