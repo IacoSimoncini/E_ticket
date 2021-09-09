@@ -4,3 +4,4 @@ tick/__pycache__/
 E_Ticket/__pycache__/
 tick/contracts/__pycache__/
 tick/migrations/__pycache__/
+db.sqlite3

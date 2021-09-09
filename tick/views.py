@@ -129,7 +129,7 @@ def createEvent(request):
         if form.is_valid():
             
             form=form.save()    
-            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])
+            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],int(request.POST['prezzo']))
             contract_event=sc.deploy_contract(tx_receipt, abi, w3)
             return redirect ('/tick/manager/')
 
