@@ -97,26 +97,7 @@ contract Event is Ownable{
      * Setter methods
     **/
 
-    function setNameEvent(string memory _nameEvent) onlyOwner public returns(bool) {
-        nameEvent = _nameEvent;
-        return true;
-    }
-
-    function setLocationEvent(string memory _locationEvent) onlyOwner public returns(bool) {
-        locationEvent = _locationEvent;
-        return true;
-    }
-    
-    function setTicketPrice(uint256 _ticketPrice) onlyOwner public returns(bool) {
-        ticketPrice = _ticketPrice;
-        return true;
-    }
-
-    function setTicketAvailable(uint256 _numTicketsAvailable) onlyOwner public returns(bool) {
-        numTicketsAvailable = _numTicketsAvailable;
-        return true;
-    }
-    
+   
     function deleteEvent(uint256 _eventID) onlyOwner public returns(bool) {
         if (eventId == _eventID){
             deleted = true;
@@ -124,6 +105,15 @@ contract Event is Ownable{
         } else {
             return false;
         }
+    }
+
+    function setValues (uint256 num_ticket, string memory nome,string memory luogo,uint256 prezzo) public returns(bool){
+        numTicketsAvailable = numTicketsAvailable+num_ticket-numTicketsTotal;
+        numTicketsTotal = num_ticket;
+        nameEvent = nome;
+        locationEvent = luogo;
+        ticketPrice = prezzo;
+        return true;
     }
     
     /**
@@ -156,5 +146,6 @@ contract Event is Ownable{
         ticket[owner].valid = false;
         return true;
     }
+    
     
 }

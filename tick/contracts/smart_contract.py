@@ -1,6 +1,7 @@
 from web3 import Web3, contract
 from web3.middleware import geth_poa_middleware
 import json
+import random,string
 
 def start_web3():
     '''
@@ -24,6 +25,10 @@ def create_contract(abi, bytecode, w3):
     '''
     contract_not_deployed = w3.eth.contract(abi=abi, bytecode=bytecode)
     return contract_not_deployed
+
+#bisogna resettare anche i ticket
+def update_contract(contract_event, id, num_ticket,nome,luogo,prezzo):
+    return contract_event.functions.setValues(num_ticket,nome,luogo,prezzo).transact()
 
 def hash_receipt(contract_not_deployed, w3):
     '''
@@ -56,22 +61,31 @@ def deploy_contract(tx_receipt, abi, w3):
         deployed_contract: deployed contract
     '''
     deployed_contract = w3.eth.contract(
-        address=tx_receipt.contractAddress,
+        address=tx_receipt,
         abi=abi
     )    
     return deployed_contract
 
-def create_ticket(contract_deployed,buyer,taxSeal):
-    return contract_deployed.functions.createTicket(buyer,taxSeal)
+def getNameEvent(contract_deployed):
+    return contract_deployed.functions.getNameEvent().call()
 
-def buy_ticket(contract_deployed,buyer,taxSeal):
-    return contract_deployed.functions.buyTicket(buyer,taxSeal)  
+def getTicketAvaiable(contract_deployed):
+    return contract_deployed.functions.getNumTicketsAvailable().call()
+
+    
+
+def create_ticket(contract_deployed,buyer,taxSeal):
+    return contract_deployed.functions.createTicket(buyer,taxSeal).transact()
+
+def buy_ticket(contract_deployed,buyer):
+    taxSeal=taxSeal_generator()
+    return contract_deployed.functions.buyTicket(buyer,taxSeal).transact()
 
 def invalidation(contract_deployed,owner):
-    return contract_deployed.functions.invalidation(owner)
+    return contract_deployed.functions.invalidation(owner).transact()
 
 def delete_event(contract_deployed,event_id):
-    return contract_deployed.functions.createTicket(event_id)
+    return contract_deployed.functions.createTicket(event_id).transact()
 
 
 
@@ -89,3 +103,7 @@ def read_bytecode(bytecode_name):
         jsonFile.close()
     
     return bytecode["object"]
+
+def taxSeal_generator():
+    x = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+    return x

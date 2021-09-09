@@ -6,7 +6,7 @@ contract Ownable {
     
     event OwnershipTransferred(address indexed previousOwner, address indexed nerOwner);
     
-    constructor() public {
+    constructor() {
         owner = msg.sender;
     }
     

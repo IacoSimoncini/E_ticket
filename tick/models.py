@@ -1,5 +1,7 @@
 from django.db import models
 import datetime
+
+from eth_typing.evm import Address
 # Create your models here.
 class Tick(models.Model):
     immagine = models.ImageField()
@@ -30,7 +32,7 @@ class Event(models.Model):
     luogo = models.CharField(max_length=100)
     #data = models.DateField(auto_now_add=True, null=True)
     data_evento=models.CharField(max_length=100, default="10 marzo")
-	
+    address= models.CharField(max_length=100,default=0)
     def __str__(self):
         return self.nome
 	

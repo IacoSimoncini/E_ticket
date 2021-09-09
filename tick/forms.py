@@ -8,7 +8,7 @@ from .models import Order, Event
 class EventForm(ModelForm):
 	class Meta:
 		model = Event
-		fields = '__all__'
+		fields = ['num_ticket','immagine','category','nome','prezzo','luogo','data_evento']
 
 class CreateUserForm(UserCreationForm):
 	class Meta:

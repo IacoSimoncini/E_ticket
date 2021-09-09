@@ -15,7 +15,8 @@ import tick.contracts.smart_contract as sc
 w3 = sc.start_web3()
 abi = sc.read_abi("tick/contracts/abi_event.json")
 bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
-w3.eth.default_account = w3.eth.accounts[0]
+
+#w3.eth.default_account = w3.eth.accounts[0]
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
 
@@ -122,15 +123,19 @@ def managerPage(request):
 @login_required(login_url='login')
 @admin_only
 def createEvent(request):
+    
+
     form = EventForm()
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
         
         if form.is_valid():
             
-            form=form.save()    
-            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])
-            contract_event=sc.deploy_contract(tx_receipt, abi, w3)
+            form=form.save()   
+            
+            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])           
+            contract_event=sc.deploy_contract(tx_receipt.contractAddress, abi, w3)
+            EventForm.Meta.model.objects.filter(pk=form.id).update(address=tx_receipt.contractAddress)
             return redirect ('/tick/manager/')
 
     context={'form':form}
@@ -141,16 +146,25 @@ def createEvent(request):
 @login_required(login_url='login')
 @admin_only
 def updateEvent(request, pk):
-
+    
     event=Event.objects.get(id=pk)
     
     form = EventForm(instance=event)
     
     if request.method == 'POST':
+        
         form = EventForm(request.POST, request.FILES, instance=event)
+        
         if form.is_valid():
-            form.save()
-            return redirect ('/tick/manager/')
+            evento=EventForm.Meta.model.objects.get(id=pk)
+            reduction=evento.num_ticket-request.POST['num_ticket']
+            contract_event=sc.deploy_contract(evento.address, abi, w3)
+            if(reduction<=sc.getTicketAvaiable(contract_event)):
+                #inserire messaggio d'avviso
+                form.save()
+                tx_receipt=sc.update_contract(contract_event,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])
+                EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt.to)
+                return redirect ('/tick/manager/')
 
     context={'form':form}
     return render(request, 'tick/accounts/create_event.html', context)
@@ -159,6 +173,7 @@ def updateEvent(request, pk):
 @login_required(login_url='login')
 @admin_only
 def deleteEvent (request,pk):
+
     event=Event.objects.get(id=pk)
     if request.method == 'POST':
         event.delete()
@@ -171,12 +186,14 @@ def deleteEvent (request,pk):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
 def buyTicket (request,pk):
-
     ticket= Event.objects.get(id=pk)
     if request.method == 'POST':
         ticket.num_ticket-=1
         ticket.save()
-
+        contract_event=sc.deploy_contract(ticket.address, abi, w3)
+        tx_receipt=sc.buy_ticket(contract_event,buyer_address)
+        EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt.to)
+           
         return redirect ('/tick/user/')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
     return render(request, 'tick/accounts/confirm.html', context)
