@@ -3,6 +3,27 @@ from web3.middleware import geth_poa_middleware
 import json
 import random,string
 
+def create_account(w3):
+    '''
+    Create a new ethereum account
+    Parameters:
+        w3
+    Return:
+        acc.address: account's address
+        acc.privateKey: account's private key
+    '''
+    acc = w3.eth.account.create()
+    send_wei(w3, w3.eth.coinbase, acc.address)
+    return acc.address, acc.privateKey
+
+def send_wei(w3, sender, receiver):
+    w3.eth.send_transaction({
+        'to': receiver,
+        'from': sender,
+        'value': w3.toWei('0.5', 'ether')
+    })
+
+
 def start_web3():
     '''
     Start connection with the provider

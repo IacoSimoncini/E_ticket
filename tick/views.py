@@ -1,3 +1,4 @@
+from django.contrib.auth import forms
 from .models import Tick, Event
 from django.shortcuts import render, redirect 
 from django.http import HttpResponse
@@ -60,12 +61,15 @@ def registerPage(request):
     if request.method == 'POST':
         form=CreateUserForm(request.POST)
         if form.is_valid():
+            address, private_key = sc.create_account(w3)
             user = form.save()
             username = form.cleaned_data.get('username')
-
-            group = Group.objects.get(name='customer' )
+            print("ADDRESS: ", address)
+            print("VUOTO: ", user.address)
+            group = Group.objects.get(name='customer')
             user.groups.add(group)
             messages.success(request, 'Account created for ' + username)
+            CreateUserForm.objects.filter(pk=user.id).update(address=address)
             return redirect ('login')
 
     context = {'form': form}

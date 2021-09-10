@@ -1,5 +1,7 @@
 from django.db import models
+from django.contrib.auth.models import User
 import datetime
+from django import forms
 
 from eth_typing.evm import Address
 # Create your models here.
@@ -38,10 +40,10 @@ class Event(models.Model):
 	
 
 class Customer(models.Model):
-	name = models.CharField(max_length=200, null=True)
-	phone = models.CharField(max_length=200, null=True)
-	email = models.CharField(max_length=200, null=True)
-	date_created = models.DateTimeField(auto_now_add=True, null=True)
+	password = forms.CharField(widget=forms.PasswordInput)
+	password2 = forms.CharField(widget=forms.PasswordInput)
+	user = models.CharField(max_length=100)
+	address = models.CharField(max_length=43, null=True, default='')		# cambiare null=False in futuro
 
 	def __str__(self):
 		return self.name
