@@ -48,8 +48,10 @@ def create_contract(abi, bytecode, w3):
     return contract_not_deployed
 
 #bisogna resettare anche i ticket
-def update_contract(contract_event, id, num_ticket,nome,luogo,prezzo):
-    return contract_event.functions.setValues(num_ticket,nome,luogo,prezzo).transact()
+def update_contract(contract_event,num_ticket,nome,luogo,prezzo,w3):
+    deploy_txn = contract_event.functions.setValues(num_ticket,nome,luogo,prezzo).transact()
+    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    return txn_receipt['to']
 
 def hash_receipt(contract_not_deployed, w3):
     '''
@@ -68,6 +70,7 @@ def hash_receipt(contract_not_deployed, w3):
 def hash_receipt(contract_not_deployed, w3, id, num_ticket,nome,luogo,prezzo):
     tx_hash = contract_not_deployed.constructor(id, num_ticket,nome,luogo,prezzo).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
+    print("Contract Address: ", tx_receipt['contractAddress'])
     return tx_hash,tx_receipt
 
 
@@ -93,14 +96,14 @@ def getNameEvent(contract_deployed):
 def getTicketAvaiable(contract_deployed):
     return contract_deployed.functions.getNumTicketsAvailable().call()
 
-    
-
 def create_ticket(contract_deployed,buyer,taxSeal):
     return contract_deployed.functions.createTicket(buyer,taxSeal).transact()
 
-def buy_ticket(contract_deployed,buyer):
+def buy_ticket(contract_deployed,buyer, w3):
     taxSeal=taxSeal_generator()
-    return contract_deployed.functions.buyTicket(buyer,taxSeal).transact()
+    deploy_txn = contract_deployed.functions.buyTicket(buyer,taxSeal).transact()
+    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    return txn_receipt['to']
 
 def invalidation(contract_deployed,owner):
     return contract_deployed.functions.invalidation(owner).transact()

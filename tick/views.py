@@ -1,4 +1,3 @@
-from django.contrib.auth import forms
 from .models import Tick, Event
 from django.shortcuts import render, redirect 
 from django.http import HttpResponse
@@ -17,10 +16,8 @@ w3 = sc.start_web3()
 abi = sc.read_abi("tick/contracts/abi_event.json")
 bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
 
-#w3.eth.default_account = w3.eth.accounts[0]
+w3.eth.default_account = w3.eth.accounts[0]
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
-
-
 
 def events(request):
     events = Event.objects.all()
@@ -64,12 +61,10 @@ def registerPage(request):
             address, private_key = sc.create_account(w3)
             user = form.save()
             username = form.cleaned_data.get('username')
-            print("ADDRESS: ", address)
-            print("VUOTO: ", user.address)
             group = Group.objects.get(name='customer')
             user.groups.add(group)
             messages.success(request, 'Account created for ' + username)
-            CreateUserForm.objects.filter(pk=user.id).update(address=address)
+            CreateUserForm.Meta.model.objects.filter(pk=user.id).update(last_name=address)
             return redirect ('login')
 
     context = {'form': form}
@@ -128,7 +123,6 @@ def managerPage(request):
 @admin_only
 def createEvent(request):
     
-
     form = EventForm()
     if request.method == 'POST':
         form = EventForm(request.POST, request.FILES)
@@ -137,7 +131,7 @@ def createEvent(request):
             
             form=form.save()   
             
-            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed,w3,form.id,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])           
+            tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed, w3, form.id, int(request.POST['num_ticket']), request.POST['nome'], request.POST['luogo'], int(request.POST['prezzo']))           
             contract_event=sc.deploy_contract(tx_receipt.contractAddress, abi, w3)
             EventForm.Meta.model.objects.filter(pk=form.id).update(address=tx_receipt.contractAddress)
             return redirect ('/tick/manager/')
@@ -161,13 +155,13 @@ def updateEvent(request, pk):
         
         if form.is_valid():
             evento=EventForm.Meta.model.objects.get(id=pk)
-            reduction=evento.num_ticket-request.POST['num_ticket']
+            reduction=evento.num_ticket-int(request.POST['num_ticket'])
             contract_event=sc.deploy_contract(evento.address, abi, w3)
             if(reduction<=sc.getTicketAvaiable(contract_event)):
                 #inserire messaggio d'avviso
                 form.save()
-                tx_receipt=sc.update_contract(contract_event,request.POST['num_ticket'],request.POST['nome'],request.POST['luogo'],request.POST['prezzo'])
-                EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt.to)
+                tx_receipt=sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],int(request.POST['prezzo']),w3)
+                EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt)
                 return redirect ('/tick/manager/')
 
     context={'form':form}
@@ -195,8 +189,8 @@ def buyTicket (request,pk):
         ticket.num_ticket-=1
         ticket.save()
         contract_event=sc.deploy_contract(ticket.address, abi, w3)
-        tx_receipt=sc.buy_ticket(contract_event,buyer_address)
-        EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt.to)
+        tx_receipt=sc.buy_ticket(contract_event, request.user.last_name, w3)
+        EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt)
            
         return redirect ('/tick/user/')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html

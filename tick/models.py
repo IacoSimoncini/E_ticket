@@ -1,7 +1,7 @@
 from django.db import models
-from django.contrib.auth.models import User
-import datetime
+from django.contrib.auth.models import AbstractUser, User
 from django import forms
+from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
 
 from eth_typing.evm import Address
 # Create your models here.
@@ -39,15 +39,6 @@ class Event(models.Model):
         return self.nome
 	
 
-class Customer(models.Model):
-	password = forms.CharField(widget=forms.PasswordInput)
-	password2 = forms.CharField(widget=forms.PasswordInput)
-	user = models.CharField(max_length=100)
-	address = models.CharField(max_length=43, null=True, default='')		# cambiare null=False in futuro
-
-	def __str__(self):
-		return self.name
-
 class Tag(models.Model):
 	name = models.CharField(max_length=200, null=True)
 
@@ -78,7 +69,7 @@ class Order(models.Model):
 			('Delivered', 'Delivered'),
 			)
 
-	customer = models.ForeignKey(Customer, null=True, on_delete= models.SET_NULL)
+	customer = models.ForeignKey(User, null=True, on_delete= models.SET_NULL)
 	product = models.ForeignKey(Product, null=True, on_delete= models.SET_NULL)
 	date_created = models.DateTimeField(auto_now_add=True, null=True)
 	status = models.CharField(max_length=200, null=True, choices=STATUS)
