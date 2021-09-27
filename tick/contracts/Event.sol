@@ -27,7 +27,7 @@ contract Event is Ownable{
         bool valid;
     }
 
-    mapping (address => Tickets) public ticket;
+    mapping (address => Tickets[]) public ticket;
     /**
      * Constructor that creates tickets when the event is created
      *
@@ -80,7 +80,7 @@ contract Event is Ownable{
         return deleted;
     }
 
-    function getTicket(address _ticketOwner) public view returns(Tickets memory){
+    function getTickets(address _ticketOwner) public view returns(Tickets[] memory){
         return ticket[_ticketOwner];
     }
 
@@ -132,7 +132,7 @@ contract Event is Ownable{
             taxSeal: _taxSeal,
             valid: true
         });
-        ticket[buyer] = _ticket;
+        ticket[buyer].push(_ticket);
         return _ticketID;
     }
     
@@ -142,8 +142,9 @@ contract Event is Ownable{
         emit BuyTicketEvent(buyer, _ticketID);
         return true;
     }
-        function invalidation(address owner) onlyOwner public returns(bool){
-        ticket[owner].valid = false;
+    
+    function invalidation(address owner, uint256 ticketID) onlyOwner public returns(bool){
+        ticket[owner][ticketID].valid = false;
         return true;
     }
     

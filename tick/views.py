@@ -160,8 +160,8 @@ def updateEvent(request, pk):
             if(reduction<=sc.getTicketAvaiable(contract_event)):
                 #inserire messaggio d'avviso
                 form.save()
-                tx_receipt=sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],int(request.POST['prezzo']),w3)
-                EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt)
+                contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],int(request.POST['prezzo']),w3)
+                EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
                 return redirect ('/tick/manager/')
 
     context={'form':form}
@@ -188,10 +188,12 @@ def buyTicket (request,pk):
     if request.method == 'POST':
         ticket.num_ticket-=1
         ticket.save()
+        print(ticket.address)
         contract_event=sc.deploy_contract(ticket.address, abi, w3)
-        tx_receipt=sc.buy_ticket(contract_event, request.user.last_name, w3)
-        EventForm.Meta.model.objects.filter(pk=pk).update(address=tx_receipt)
-           
+        contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
+        EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
+        ticket = sc.getTickets(contract_event, request.user.last_name)
+        print(ticket)
         return redirect ('/tick/user/')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
     return render(request, 'tick/accounts/confirm.html', context)
@@ -224,5 +226,31 @@ def resellerPage(request):
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['reseller'])
 def manageTicket(request,pk):
-    context={}
+    
+    ticket= Event.objects.get(id=pk)
+
+    purchased = Event.objects.exclude(address=0)
+    total_purchased=purchased.count()
+
+    purchased_cinema=purchased.filter(category='Cinema')
+    purchased_sport=purchased.filter(category='Sport')
+    purchased_teatro=purchased.filter(category='Teatro')
+    purchased_concerti=purchased.filter(category='Concerti')
+
+    contract_deployed=sc.deploy_contract(ticket.address, abi, w3)
+    
+    Users = list(User.objects.exclude(last_name=""))
+    
+    tickets = []
+
+    for user in Users:
+        tick = sc.getTickets(contract_deployed, user.last_name)
+        tickets.append(tick)
+    
+    tickets = [item for sublist in tickets for item in sublist]
+
+    print(tickets)
+
+    context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
     return render(request, 'tick/accounts/manage_ticket.html',  context)
+

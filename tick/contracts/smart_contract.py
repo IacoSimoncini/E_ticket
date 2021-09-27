@@ -111,8 +111,11 @@ def invalidation(contract_deployed,owner):
 def delete_event(contract_deployed,event_id):
     return contract_deployed.functions.createTicket(event_id).transact()
 
+def getTickets(contract_deployed, owner):
+    return contract_deployed.functions.getTickets(owner).call()
 
-
+def getSoldTickets(contract_deployed):
+    return contract_deployed.functions.getSoldTickets().call()
 
 def read_abi(abi_name):
     with open(abi_name) as jsonFile:
