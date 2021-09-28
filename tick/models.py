@@ -32,8 +32,8 @@ class Event(models.Model):
     nome = models.CharField(max_length=100)
     prezzo = models.FloatField()
     luogo = models.CharField(max_length=100)
-    #data = models.DateField(auto_now_add=True, null=True)
-    data_evento=models.CharField(max_length=100, default="10 marzo")
+    data_evento = models.DateTimeField(auto_now_add=True)
+    #data_evento=models.CharField(max_length=100, default="10 marzo")
     address= models.CharField(max_length=100,default=0)
     def __str__(self):
         return self.nome

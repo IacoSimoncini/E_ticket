@@ -105,13 +105,17 @@ def buy_ticket(contract_deployed,buyer, w3):
     txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
-def invalidation(contract_deployed,owner):
-    return contract_deployed.functions.invalidation(owner).transact()
+def invalidation(contract_deployed,owner,w3):
+    deploy_txn =contract_deployed.functions.invalidation(owner).transact()
+    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    return txn_receipt['to']
 
-def delete_event(contract_deployed,event_id):
-    return contract_deployed.functions.createTicket(event_id).transact()
+def delete_event(contract_deployed,event_id,w3):
+    deploy_txn=contract_deployed.functions.deleteEvent(event_id).transact()
+    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    return txn_receipt['to']
 
-def getTickets(contract_deployed, owner):
+def getTickets(contract_deployed, owner):    
     return contract_deployed.functions.getTickets(owner).call()
 
 def getSoldTickets(contract_deployed):
