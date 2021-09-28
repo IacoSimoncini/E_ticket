@@ -255,7 +255,6 @@ def manageTicket(request,pk):
                 t += (user.username, )
                 tickets.append(t)
     
-    #tickets = [item for sublist in tickets for item in sublist]
 
     context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
     return render(request, 'tick/accounts/manage_ticket.html',  context)
