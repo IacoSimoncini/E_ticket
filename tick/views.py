@@ -11,6 +11,8 @@ from django.contrib import messages
 from .decorators import unauthenticated_user, allowed_users, admin_only
 from django.db.models import F
 import tick.contracts.smart_contract as sc
+import utils
+
 
 w3 = sc.start_web3()
 abi = sc.read_abi("tick/contracts/abi_event.json")
@@ -19,6 +21,7 @@ bytecode = sc.read_bytecode("tick/contracts/bytecode_event.json")
 w3.eth.default_account = w3.eth.accounts[0]
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
+utils.setup(sc,w3,abi)
 def events(request):
     events = Event.objects.all()
     total_events = events.count()
@@ -245,11 +248,17 @@ def manageTicket(request,pk):
 
     for user in Users:
         tick = sc.getTickets(contract_deployed, user.last_name)
+        if type(tick) is list:
+            for t in tick:
+                t+=user.username
+        else:
+            tick+=user.username
+            
         tickets.append(tick)
     
     tickets = [item for sublist in tickets for item in sublist]
 
-    print(tickets)
+   
 
     context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
     return render(request, 'tick/accounts/manage_ticket.html',  context)
