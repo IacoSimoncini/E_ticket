@@ -105,8 +105,8 @@ def buy_ticket(contract_deployed,buyer, w3):
     txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
-def invalidation(contract_deployed,owner,w3):
-    deploy_txn =contract_deployed.functions.invalidation(owner).transact()
+def invalidation(contract_deployed,owner,relative_ID,w3):
+    deploy_txn =contract_deployed.functions.invalidation(owner,relative_ID).transact()
     txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
