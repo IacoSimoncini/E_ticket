@@ -162,10 +162,11 @@ def updateEvent(request, pk):
             evento=EventForm.Meta.model.objects.get(id=pk)
             reduction=evento.num_ticket-int(request.POST['num_ticket'])
             contract_event=sc.deploy_contract(evento.address, abi, w3)
+            prezzo=int(request.POST['prezzo']*100)
             if(reduction<=sc.getTicketAvaiable(contract_event)):
                 #inserire messaggio d'avviso
                 form.save()
-                contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],int(request.POST['prezzo']),w3)
+                contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],prezzo,w3)
                 EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
                 return redirect ('/tick/manager/')
 
@@ -193,7 +194,6 @@ def buyTicket (request,pk):
     if request.method == 'POST':
         ticket.num_ticket-=1
         ticket.save()
-        print(ticket.address)
         contract_event=sc.deploy_contract(ticket.address, abi, w3)
         contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
         EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
@@ -267,24 +267,22 @@ def manageBuy(request,pk):
     ticket= Event.objects.get(id=pk)
 
     contract_deployed = sc.deploy_contract(ticket.address, abi, w3)
-    tickets = sc.getTickets(contract_deployed, request.user.last_name)
+    tickets = sc.getTickets(contract_deployed, request.user.id)
 
     context= {'tickets': tickets}
     return render(request,'tick/accounts/managebuy.html', context)
 
 @login_required(login_url='login')
-def invalidateTicket(request, pk, id, ad):
-    print(pk)
-    print(id)
-    print(ad)
+def invalidateTicket(request, pk, id_evento, id_user):
 
-    item = (pk, id, ad, )
-
+    item = (pk, id_evento, id_user, )
+    
     if request.method == 'POST':
-        event= Event.objects.get(id=id)
+        event= Event.objects.get(id=id_evento)
+        user= User.objects.get(id=id_user)
         contract_deployed=sc.deploy_contract(event.address, abi, w3)
-        contract_address =sc.invalidation(contract_deployed, ad, int(pk), w3)
-        Event.objects.filter(pk=id).update(address=contract_address)
+        contract_address =sc.invalidation(contract_deployed, user.last_name, int(pk), w3)
+        Event.objects.filter(pk=id_evento).update(address=contract_address)
         return redirect ('/tick/manage_ticket/' + id + '/')
     
     context = {'item': item}
