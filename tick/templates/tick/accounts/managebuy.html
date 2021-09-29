@@ -16,7 +16,7 @@
         <td>{{i.1}}</td>
         <td>{{i.2}}</td>
         <td>{{i.0}}</td>
-        <td><a  style = " color: #4989c9" href="">Refund</a></td>
+        <td><a  style = " color: #4989c9" href="{% url 'refund' i.1 id_evento id_user %}">Refund</a></td>
       </tr>
       {% endfor %}
     </tbody>

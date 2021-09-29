@@ -76,6 +76,7 @@ def registerPage(request):
 
 @unauthenticated_user
 def loginPage(request):
+    
     if request.method == 'POST':
         username = request.POST.get('username')
         password =request.POST.get('password')
@@ -198,7 +199,7 @@ def buyTicket (request,pk):
         contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
         EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
         ticket = sc.getTickets(contract_event, request.user.last_name)
-        print(ticket)
+        
         return redirect ('home')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
     return render(request, 'tick/accounts/confirm.html', context)
@@ -268,8 +269,8 @@ def manageBuy(request,pk):
 
     contract_deployed = sc.deploy_contract(ticket.address, abi, w3)
     tickets = sc.getTickets(contract_deployed, request.user.id)
-
-    context= {'tickets': tickets}
+    tickets=[(0,0,0,),(1,1,1,)]
+    context= {'tickets':tickets ,'id_evento':pk,'id_user':request.user.id}
     return render(request,'tick/accounts/managebuy.html', context)
 
 @login_required(login_url='login')
@@ -283,9 +284,26 @@ def invalidateTicket(request, pk, id_evento, id_user):
         contract_deployed=sc.deploy_contract(event.address, abi, w3)
         contract_address =sc.invalidation(contract_deployed, user.last_name, int(pk), w3)
         Event.objects.filter(pk=id_evento).update(address=contract_address)
-        return redirect ('/tick/manage_ticket/' + id + '/')
+        return redirect ('/tick/manage_ticket/' + id_evento + '/')
     
     context = {'item': item}
     return render(request, 'tick/accounts/confirm_inv.html', context)
+
+@login_required(login_url='login')
+def refundTicket(request, pk, id_evento, id_user):
+
+    item = (pk, id_evento, id_user, )
+    
+    if request.method == 'POST':
+        event= Event.objects.get(id=id_evento)
+        user= User.objects.get(id=id_user)
+        contract_deployed=sc.deploy_contract(event.address, abi, w3)
+        contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
+        Event.objects.filter(pk=id_evento).update(address=contract_address)
+        return redirect ('/tick/managebuy/' + id_evento + '/')
+    
+    context = {'item': item}
+    return render(request, 'tick/accounts/confirm_ref.html', context)
+    
     
   

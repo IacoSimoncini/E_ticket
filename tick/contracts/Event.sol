@@ -20,6 +20,7 @@ contract Event is Ownable{
     uint256 private ticketPrice;
     
     bool private deleted;
+
     
     struct Tickets{
         string taxSeal; // Generated outside the smart contract (inside the smart contract could be risky)
@@ -28,6 +29,8 @@ contract Event is Ownable{
     }
 
     mapping (address => Tickets[]) public ticket;
+
+    Tickets[] refund_list; 
     /**
      * Constructor that creates tickets when the event is created
      *
@@ -44,7 +47,7 @@ contract Event is Ownable{
         uint256 _ticketPrice) 
     {
         numTicketsAvailable = _numTicketsAvailable;
-      numTicketsTotal = _numTicketsAvailable;
+        numTicketsTotal = _numTicketsAvailable;
         eventId = _eventId;
         nameEvent = _nameEvent;
         locationEvent = _locationEvent;
@@ -137,14 +140,30 @@ contract Event is Ownable{
     }
     
     function buyTicket(address buyer, string memory _taxSeal) public returns(bool){
-        numTicketsTotal = numTicketsTotal - 1;
-        uint256 _ticketID = createTicket(buyer, _taxSeal);
+        numTicketsAvailable -= 1;
+        uint256 _ticketID;
+        if(refund_list.length!=0){
+            ticket[buyer].push(refund_list[refund_list.length-1]);
+            _ticketID=refund_list[refund_list.length-1].ticketID;
+            refund_list.pop();
+        }
+        else
+            _ticketID = createTicket(buyer, _taxSeal);
         emit BuyTicketEvent(buyer, _ticketID);
         return true;
     }
     
-    function invalidation(address owner, uint256 ticketID) onlyOwner public returns(bool){
-        ticket[owner][ticketID].valid = false;
+    function invalidation(address owner, uint256 relativeID) onlyOwner public returns(bool){
+        ticket[owner][relativeID].valid = false;
+        return true;
+    }
+    
+    function refundTicket(address owner,uint256 relativeID) public returns(bool){
+        refund_list.push(ticket[owner][relativeID]);
+        delete ticket[owner][relativeID];
+        numTicketsAvailable+=1;
+        if (ticket[owner].length==0)
+            delete ticket[owner];        
         return true;
     }
     

@@ -70,7 +70,6 @@ def hash_receipt(contract_not_deployed, w3):
 def hash_receipt(contract_not_deployed, w3, id, num_ticket,nome,luogo,prezzo):
     tx_hash = contract_not_deployed.constructor(id, num_ticket,nome,luogo,prezzo).transact()
     tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-    print("Contract Address: ", tx_receipt['contractAddress'])
     return tx_hash,tx_receipt
 
 
@@ -121,6 +120,11 @@ def getTickets(contract_deployed, owner):
 def getSoldTickets(contract_deployed):
     return contract_deployed.functions.getSoldTickets().call()
 
+def refundTicket(contract_deployed,owner,relative_ID,w3):
+    deploy_txn =contract_deployed.functions.refundTicket(owner,relative_ID).transact()
+    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    return txn_receipt['to']
+
 def read_abi(abi_name):
     with open(abi_name) as jsonFile:
         abi = json.load(jsonFile)
@@ -134,6 +138,8 @@ def read_bytecode(bytecode_name):
         jsonFile.close()
     
     return bytecode["object"]
+
+
 
 def taxSeal_generator():
     x = ''.join(random.choices(string.ascii_letters + string.digits, k=16))

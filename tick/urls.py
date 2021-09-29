@@ -17,8 +17,8 @@ urlpatterns = [
     path ('reseller/', views.resellerPage, name='reseller-page'),
     path ('manage_ticket/<str:pk>/', views.manageTicket, name='manage_ticket'),
     path ('managebuy/<str:pk>/', views.manageBuy, name='managebuy'),
-    path ('invalidate/<str:pk>/<str:id_evento>/<str:id_user>/', views.invalidateTicket, name='invalidate')
-    
+    path ('invalidate/<str:pk>/<str:id_evento>/<str:id_user>/', views.invalidateTicket, name='invalidate'),
+    path ('refund/<str:pk>/<str:id_evento>/<str:id_user>/', views.refundTicket, name='refund')
 ]
 
 
