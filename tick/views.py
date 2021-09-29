@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import EventForm, CreateUserForm
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
-from .decorators import unauthenticated_user, allowed_users, admin_only
+from .decorators import unauthenticated_user, allowed_users, admin_only, profile
 from django.db.models import F
 import tick.contracts.smart_contract as sc
 import tick.utils as utils
@@ -36,7 +36,7 @@ def events(request):
 
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['customer'])
+@profile
 def userPage(request):
     events = Event.objects.all()
     total_events = events.count()
@@ -45,6 +45,7 @@ def userPage(request):
     sport= events.filter(category='Sport')
     teatro= events.filter(category='Teatro')
     concerti= events.filter(category='Concerti')
+
 
     context= {'events':events, 'total_events':total_events, 'film':film, 'sport':sport, 'teatro':teatro, 'concerti':concerti }
 
@@ -84,7 +85,7 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             if user.groups.filter(name='customer'):
-                return redirect('home')
+                return redirect('user-page')
             if user.groups.filter(name='reseller'):
                 return redirect('reseller-page')
             else: 
@@ -259,3 +260,16 @@ def manageTicket(request,pk):
     context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
     return render(request, 'tick/accounts/manage_ticket.html',  context)
 
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def manageBuy(request,pk):
+    ticket= Event.objects.get(id=pk)
+
+
+    context= {}
+
+    return render(request,'tick/accounts/managebuy.html', context)
+ 
+  

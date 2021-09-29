@@ -16,6 +16,7 @@ urlpatterns = [
     path ('user/buy_ticket/<str:pk>/', views.buyTicket, name='buy_ticket'),
     path ('reseller/', views.resellerPage, name='reseller-page'),
     path ('manage_ticket/<str:pk>/', views.manageTicket, name='manage_ticket'),
+    path ('managebuy/<str:pk>/', views.manageBuy, name='managebuy')
     
 ]
 
