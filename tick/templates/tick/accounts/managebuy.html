@@ -1,7 +1,29 @@
 {% extends 'tick/common.html' %}
 {% block content %}
 
+<h2>Biglietti acquistati relativi all'evento ""</h2>
 
-<h1>Gestisci</h1>
+<div class="container-fluid">
+	<div class="col-md-5">
+<table class="table table-sm">
+      <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Valido</th>
+        <th scope="col">Sigillo fiscale</th>
+      </tr>
+      {% for i in tickets %}
+      <tr>
+        <td>{{i.1}}</td>
+        <td>{{i.2}}</td>
+        <td>{{i.0}}</td>
+        <td><a  style = " color: #4989c9" href="">Refund</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+    </div>
+</div>
+
 
 {% endblock %}

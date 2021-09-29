@@ -85,7 +85,7 @@ def loginPage(request):
         if user is not None:
             login(request, user)
             if user.groups.filter(name='customer'):
-                return redirect('user-page')
+                return redirect('home')
             if user.groups.filter(name='reseller'):
                 return redirect('reseller-page')
             else: 
@@ -199,7 +199,7 @@ def buyTicket (request,pk):
         EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
         ticket = sc.getTickets(contract_event, request.user.last_name)
         print(ticket)
-        return redirect ('/tick/user/')
+        return redirect ('home')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
     return render(request, 'tick/accounts/confirm.html', context)
 
@@ -253,23 +253,41 @@ def manageTicket(request,pk):
 
         if type(tick) is list:
             for t in tick:
-                t += (user.username, )
-                tickets.append(t)
+                if t[2] == True:
+                    t += (user.username, user.last_name, pk, )
+                    tickets.append(t)
     
 
     context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
     return render(request, 'tick/accounts/manage_ticket.html',  context)
-
-
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
 def manageBuy(request,pk):
     ticket= Event.objects.get(id=pk)
 
+    contract_deployed = sc.deploy_contract(ticket.address, abi, w3)
+    tickets = sc.getTickets(contract_deployed, request.user.last_name)
 
-    context= {}
-
+    context= {'tickets': tickets}
     return render(request,'tick/accounts/managebuy.html', context)
- 
+
+@login_required(login_url='login')
+def invalidateTicket(request, pk, id, ad):
+    print(pk)
+    print(id)
+    print(ad)
+
+    item = (pk, id, ad, )
+
+    if request.method == 'POST':
+        event= Event.objects.get(id=id)
+        contract_deployed=sc.deploy_contract(event.address, abi, w3)
+        contract_address =sc.invalidation(contract_deployed, ad, int(pk), w3)
+        Event.objects.filter(pk=id).update(address=contract_address)
+        return redirect ('/tick/manage_ticket/' + id + '/')
+    
+    context = {'item': item}
+    return render(request, 'tick/accounts/confirm_inv.html', context)
+    
   

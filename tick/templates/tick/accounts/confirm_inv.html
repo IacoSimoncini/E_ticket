@@ -1,0 +1,15 @@
+{% extends 'tick/common.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container-fluid">
+<p>Are you sure you want to invalidate?</p>
+<form action="{% url 'invalidate' item.0 item.1 item.2 %}" method="POST">
+    {% csrf_token %}
+    <a class="btn btn-warning" href="{% url 'manage_ticket' item.1 %}">Cancel</a>
+    <input class="btn btn-danger" type="submit" name="Confirm">
+
+</form>
+
+</div>
+{% endblock %}

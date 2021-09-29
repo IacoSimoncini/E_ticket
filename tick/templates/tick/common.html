@@ -92,13 +92,13 @@
     <div style="text-align: left;"class="container-fluid">
       <div class="navbar-brand"  id="scripts">
         {% load static %}
-        <img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height="">
+        <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
         E-Ticket
 	  </div>
     </div>
 	{% if request.user.is_authenticated %}
 	<div  style="text-align: right;" class="container-fluid">
-	<span  id="scripts">Hello, {{request.user}}</a></span>
+	<span  id="scripts">Hello, <a href="{% url 'user-page' %}">{{request.user}}</a></span>
     <span><a class="hello-msg" id="logout" href="{% url 'logout' %}">Logout</a></span>
 	</div>
     

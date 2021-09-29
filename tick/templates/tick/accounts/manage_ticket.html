@@ -12,13 +12,15 @@
         <th scope="col">Id</th>
         <th scope="col">Nome</th>
         <th scope="col">Sigillo fiscale</th>
+        <th scope="col">Address</th>
       </tr>
       {% for i in tickets %}
       <tr>
         <td>{{i.1}}</td>
         <td>{{i.3}}</td>
         <td>{{i.0}}</td>
-        <td><a  style = " color: #4989c9" href="">Invalida Biglietto</a></td>
+        <td>{{i.4}}</td>
+        <td><a  style = " color: #4989c9" href="{% url 'invalidate' i.1 i.5 i.4 %}">Invalida Biglietto</a></td>
       </tr>
       {% endfor %}
     </tbody>
