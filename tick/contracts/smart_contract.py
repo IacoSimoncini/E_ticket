@@ -116,7 +116,14 @@ def delete_event(contract_deployed,event_id,w3):
     return txn_receipt['to']
 
 def getTickets(contract_deployed, owner):    
-    return contract_deployed.functions.getTickets(owner).call()
+    tickets=contract_deployed.functions.getTickets(owner).call()
+    final_tickets=[]
+    for t in tickets:
+        if t[0]!="":
+            final_tickets.append(t)
+    return final_tickets
+
+        
 
 def getSoldTickets(contract_deployed):
     return contract_deployed.functions.getSoldTickets().call()
