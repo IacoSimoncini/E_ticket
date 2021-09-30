@@ -15,7 +15,7 @@
           <form style="text-align: center;"action="{% url 'buy_ticket' ticket.id %}" method="POST">
             {% csrf_token %}
             <a class="btn btn-warning" href="{% url 'user-page' %}">Cancel</a>
-            <input class="btn btn-danger" type="submit" name="Confirm">
+            <input class="btn btn-danger" type="submit" name="Confirm" value="Confirm">
 
         </form><br>
         </div>

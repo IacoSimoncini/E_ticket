@@ -292,12 +292,13 @@ def manageBuy(request,pk):
 @login_required(login_url='login')
 def invalidateTicket(request, pk, id_evento, id_user):
 
-    item = (pk, id_evento, id_user, )
+    user = User.objects.get(id=id_user)
+
+    item = (pk, id_evento, id_user, user.username, )
     
     if request.method == 'POST':
         try:
             event= Event.objects.get(id=id_evento)
-            user= User.objects.get(id=id_user)
             contract_deployed=sc.deploy_contract(event.address, abi, w3)
             contract_address =sc.invalidation(contract_deployed, user.last_name, int(pk), w3)
             Event.objects.filter(pk=id_evento).update(address=contract_address)
