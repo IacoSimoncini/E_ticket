@@ -7,7 +7,7 @@
 <form action="{% url 'invalidate' item.0 item.1 item.2 %}" method="POST">
     {% csrf_token %}
     <a class="btn btn-warning" href="{% url 'manage_ticket' item.1 %}">Cancel</a>
-    <input class="btn btn-danger" type="submit" name="Confirm">
+    <input class="btn btn-danger" type="submit" name="Confirm" value="Confirm">
 
 </form>
 
