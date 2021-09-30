@@ -271,7 +271,7 @@
 			},
 			{
 				"internalType": "uint256",
-				"name": "ticketID",
+				"name": "relativeID",
 				"type": "uint256"
 			}
 		],
@@ -310,6 +310,30 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
+			},
+			{
+				"internalType": "uint256",
+				"name": "relativeID",
+				"type": "uint256"
+			}
+		],
+		"name": "refundTicket",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

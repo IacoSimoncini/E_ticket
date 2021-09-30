@@ -102,6 +102,7 @@ def buy_ticket(contract_deployed,buyer, w3):
     taxSeal=taxSeal_generator()
     deploy_txn = contract_deployed.functions.buyTicket(buyer,taxSeal).transact()
     txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    getTickets(contract_deployed,buyer)
     return txn_receipt['to']
 
 def invalidation(contract_deployed,owner,relative_ID,w3):
@@ -121,8 +122,10 @@ def getSoldTickets(contract_deployed):
     return contract_deployed.functions.getSoldTickets().call()
 
 def refundTicket(contract_deployed,owner,relative_ID,w3):
+    print(getTickets(contract_deployed,owner))
     deploy_txn =contract_deployed.functions.refundTicket(owner,relative_ID).transact()
     txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    print(getTickets(contract_deployed,owner))
     return txn_receipt['to']
 
 def read_abi(abi_name):
