@@ -159,12 +159,16 @@ contract Event is Ownable{
     }
     
     function refundTicket(address owner,uint256 relativeID) public returns(bool){
-        refund_list.push(ticket[owner][relativeID]);
-        delete ticket[owner][relativeID];
-        numTicketsAvailable+=1;
-        if (ticket[owner].length==0)
-            delete ticket[owner];        
-        return true;
+        
+        if(ticket[owner].length!=0){
+            refund_list.push(ticket[owner][relativeID]);
+            for (uint i = relativeID; i<ticket[owner].length-1; i++){
+                ticket[owner][i] = ticket[owner][i+1];
+            }
+            ticket[owner].pop();
+            numTicketsAvailable+=1;
+            return true;}
+        else return false;
     }
     
     
