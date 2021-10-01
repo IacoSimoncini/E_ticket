@@ -205,14 +205,14 @@ def deleteEvent (request,pk):
 def buyTicket (request,pk):
     ticket= Event.objects.get(id=pk)
     if request.method == 'POST':
-        try:
+        if 1:
             ticket.num_ticket-=1
             ticket.save()
             contract_event=sc.deploy_contract(ticket.address, abi, w3)
             contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
             EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
             ticket = sc.getTickets(contract_event, request.user.last_name)
-        except:
+        else:
             return redirect ('/tick/error/')
         return redirect ('home')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
@@ -315,14 +315,11 @@ def refundTicket(request, pk, id_evento, id_user):
     item = (pk, id_evento, id_user, )
     
     if request.method == 'POST':
-        try:
-            event= Event.objects.get(id=id_evento)
-            user= User.objects.get(id=id_user)
-            contract_deployed=sc.deploy_contract(event.address, abi, w3)
-            contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
-            Event.objects.filter(pk=id_evento).update(address=contract_address)
-        except:
-            return redirect ('/tick/error/')
+        event= Event.objects.get(id=id_evento)
+        user= User.objects.get(id=id_user)
+        contract_deployed=sc.deploy_contract(event.address, abi, w3)
+        contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
+        Event.objects.filter(pk=id_evento).update(address=contract_address)
         return redirect ('/tick/managebuy/' + id_evento + '/')
     
     context = {'item': item}

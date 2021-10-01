@@ -92,7 +92,15 @@
     <div style="text-align: left;"class="container-fluid">
       <div class="navbar-brand"  id="scripts">
         {% load static %}
+		{% if request.user.is_anonymous %}
         <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
+		{% endif %}
+		{% if request.user.is_autenticated %}
+        <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
+		{% endif %}
+		{% if request.user.username == 'reseller' %}
+        <a  href="{% url 'reseller-page' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
+		{% endif %}
         E-Ticket
 	  </div>
     </div>
