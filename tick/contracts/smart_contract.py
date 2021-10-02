@@ -50,7 +50,7 @@ def create_contract(abi, bytecode, w3):
 #bisogna resettare anche i ticket
 def update_contract(contract_event,num_ticket,nome,luogo,prezzo,w3):
     deploy_txn = contract_event.functions.setValues(num_ticket,nome,luogo,prezzo).transact()
-    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
 def hash_receipt(contract_not_deployed, w3):
@@ -95,24 +95,21 @@ def getNameEvent(contract_deployed):
 def getTicketAvaiable(contract_deployed):
     return contract_deployed.functions.getNumTicketsAvailable().call()
 
-def create_ticket(contract_deployed,buyer,taxSeal):
-    return contract_deployed.functions.createTicket(buyer,taxSeal).transact()
 
 def buy_ticket(contract_deployed,buyer, w3):
     taxSeal=taxSeal_generator()
     deploy_txn = contract_deployed.functions.buyTicket(buyer,taxSeal).transact()
-    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
-    getTickets(contract_deployed,buyer)
+    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
 def invalidation(contract_deployed,owner,relative_ID,w3):
     deploy_txn =contract_deployed.functions.invalidation(owner,relative_ID).transact()
-    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
 def delete_event(contract_deployed,event_id,w3):
     deploy_txn=contract_deployed.functions.deleteEvent(event_id).transact()
-    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
+    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
     return txn_receipt['to']
 
 def getTickets(contract_deployed, owner):    
@@ -125,10 +122,10 @@ def getSoldTickets(contract_deployed):
     return contract_deployed.functions.getSoldTickets().call()
 
 def refundTicket(contract_deployed,owner,relative_ID,w3):
-    print(getTickets(contract_deployed,owner))
+    print("PRIMAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaA: ", relative_ID)
     deploy_txn =contract_deployed.functions.refundTicket(owner,relative_ID).transact()
-    txn_receipt = w3.eth.get_transaction_receipt(deploy_txn)
-    print(getTickets(contract_deployed,owner))
+    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
+    
     return txn_receipt['to']
 
 def read_abi(abi_name):

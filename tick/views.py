@@ -143,7 +143,9 @@ def createEvent(request):
                 form=form.save()   
                 tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed, w3, form.id, int(request.POST['num_ticket']), request.POST['nome'], request.POST['luogo'], int(request.POST['prezzo']))           
                 contract_event=sc.deploy_contract(tx_receipt.contractAddress, abi, w3)
+                #tx_receipt=w3.eth.wait_for_transaction_receipt(contract_event)
                 EventForm.Meta.model.objects.filter(pk=form.id).update(address=tx_receipt.contractAddress)
+                
             except:
                 return redirect ('/tick/error/')
             return redirect ('/tick/manager/')
@@ -192,7 +194,8 @@ def deleteEvent (request,pk):
     if request.method == 'POST':
         try:
             event.delete()
-            sc.delete_event(pk)
+            contract_event=sc.deploy_contract(event.address, abi, w3)
+            sc.delete_event(contract_event,int(pk),w3)
         except:
             return redirect ('/tick/error/')
         return redirect ('/tick/manager/')
@@ -205,14 +208,15 @@ def deleteEvent (request,pk):
 def buyTicket (request,pk):
     ticket= Event.objects.get(id=pk)
     if request.method == 'POST':
-        if 1:
+        try:
             ticket.num_ticket-=1
             ticket.save()
+           
             contract_event=sc.deploy_contract(ticket.address, abi, w3)
             contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
             EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
             ticket = sc.getTickets(contract_event, request.user.last_name)
-        else:
+        except:
             return redirect ('/tick/error/')
         return redirect ('home')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
@@ -284,7 +288,13 @@ def manageBuy(request,pk):
     ticket= Event.objects.get(id=pk)
 
     contract_deployed = sc.deploy_contract(ticket.address, abi, w3)
-    tickets = sc.getTickets(contract_deployed, request.user.last_name)
+    temp_tick = sc.getTickets(contract_deployed, request.user.last_name)
+    tickets=[]
+    for i,tick in enumerate(temp_tick):
+            tick+=(i,)
+            tickets.append(tick)
+
+
 
     context= {'tickets':tickets ,'id_evento':pk,'id_user':request.user.id}
     return render(request,'tick/accounts/managebuy.html', context)
@@ -315,11 +325,15 @@ def refundTicket(request, pk, id_evento, id_user):
     item = (pk, id_evento, id_user, )
     
     if request.method == 'POST':
-        event= Event.objects.get(id=id_evento)
-        user= User.objects.get(id=id_user)
-        contract_deployed=sc.deploy_contract(event.address, abi, w3)
-        contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
-        Event.objects.filter(pk=id_evento).update(address=contract_address)
+        if 1==1:
+            event= Event.objects.get(id=id_evento)
+            user= User.objects.get(id=id_user)
+            contract_deployed=sc.deploy_contract(event.address, abi, w3)
+            contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
+            num_ticket=event.num_ticket+1
+            Event.objects.filter(pk=id_evento).update(address=contract_address,num_ticket=num_ticket)
+        #except:
+            #return redirect ('/tick/error/')
         return redirect ('/tick/managebuy/' + id_evento + '/')
     
     context = {'item': item}
