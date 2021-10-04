@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, User
 from django import forms
-from django.contrib.auth.models import (BaseUserManager, AbstractBaseUser)
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 from eth_typing.evm import Address
 # Create your models here.
@@ -26,13 +26,13 @@ class Event(models.Model):
 		('Concerti', 'Concerti'),
 		)
 
-    num_ticket = models.IntegerField() #ticket disponibili
+    num_ticket = models.PositiveIntegerField() #ticket disponibili
     immagine = models.ImageField(null=True, blank=True, default='static/tick/default.jpg')
-    category = models.CharField(max_length=200, null=True, choices=CATEGORY)
-    nome = models.CharField(max_length=100)
-    prezzo = models.FloatField()
-    luogo = models.CharField(max_length=100)
-    data_evento = models.DateTimeField()
+    category = models.CharField(max_length=200, null=False, choices=CATEGORY)
+    nome = models.CharField(max_length=100, null=False)
+    prezzo = models.FloatField(validators = [MinValueValidator(0.0)])
+    luogo = models.CharField(max_length=100, null=False)
+    data_evento = models.DateTimeField(null=False)
     #data_evento=models.CharField(max_length=100, default="10 marzo")
     address= models.CharField(max_length=100,default=0)
     def __str__(self):
