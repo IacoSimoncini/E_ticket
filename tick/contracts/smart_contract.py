@@ -122,11 +122,12 @@ def getSoldTickets(contract_deployed):
     return contract_deployed.functions.getSoldTickets().call()
 
 def refundTicket(contract_deployed,owner,relative_ID,w3):
-    print("PRIMAAAaaaaaaaaaaaaaaaaaaaaaaaaaaaA: ", relative_ID)
-    deploy_txn =contract_deployed.functions.refundTicket(owner,relative_ID).transact()
-    txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
-    
-    return txn_receipt['to']
+    result = contract_deployed.functions.refundTicket(owner, relative_ID).call()
+    if result:
+        deploy_txn =contract_deployed.functions.refundTicket(owner,relative_ID).transact()
+        txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
+        return result
+    return result
 
 def read_abi(abi_name):
     with open(abi_name) as jsonFile:

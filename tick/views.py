@@ -1,4 +1,6 @@
 from logging import raiseExceptions
+
+from django.db.models.expressions import Expression
 from .models import Tick, Event
 from django.shortcuts import render, redirect 
 from django.http import HttpResponse
@@ -13,6 +15,7 @@ from .decorators import unauthenticated_user, allowed_users, admin_only, profile
 from django.db.models import F
 import tick.contracts.smart_contract as sc
 import tick.utils as utils
+import traceback
 
 
 w3 = sc.start_web3()
@@ -23,7 +26,7 @@ w3.eth.default_account = w3.eth.accounts[0]
 contract_event_not_deployed = sc.create_contract(abi, bytecode, w3)
 
 def events(request):
-    events = Event.objects.all()
+    events = Event.objects.exclude(num_ticket=0)
     total_events = events.count()
 
     film= events.filter(category='Cinema')
@@ -140,13 +143,15 @@ def createEvent(request):
         
         if form.is_valid():
             try:
-                form=form.save()   
+                form=form.save()
                 tx_hash,tx_receipt=sc.hash_receipt(contract_event_not_deployed, w3, form.id, int(request.POST['num_ticket']), request.POST['nome'], request.POST['luogo'], int(request.POST['prezzo']))           
                 contract_event=sc.deploy_contract(tx_receipt.contractAddress, abi, w3)
                 #tx_receipt=w3.eth.wait_for_transaction_receipt(contract_event)
                 EventForm.Meta.model.objects.filter(pk=form.id).update(address=tx_receipt.contractAddress)
                 
-            except:
+            except Exception:
+                print(traceback.format_exc())
+                EventForm.Meta.model.objects.filter(pk=form.id).delete()
                 return redirect ('/tick/error/')
             return redirect ('/tick/manager/')
 
@@ -169,16 +174,19 @@ def updateEvent(request, pk):
         
         if form.is_valid():
             try:
-                evento=EventForm.Meta.model.objects.get(id=pk)
-                reduction=evento.num_ticket-int(request.POST['num_ticket'])
-                contract_event=sc.deploy_contract(evento.address, abi, w3)
-                prezzo=int(request.POST['prezzo']*100)
+                evento = EventForm.Meta.model.objects.get(id=pk)
+                contract_event = sc.deploy_contract(evento.address, abi, w3)
+                sold_ticket = sc.getSoldTickets(contract_event)
+                reduction = evento.num_ticket - int(request.POST['num_ticket']) + sold_ticket
+                prezzo = int(request.POST['prezzo']*100)
                 if(reduction<=sc.getTicketAvaiable(contract_event)):
-                    #inserire messaggio d'avviso
-                    form.save()
                     contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],prezzo,w3)
                     EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
-            except:
+                    form.save()
+                else:
+                    messages.error(request, 'Too many places removed')
+            except Exception:
+                print(traceback.format_exc())
                 return redirect ('/tick/error/')
             return redirect ('/tick/manager/')
 
@@ -193,9 +201,9 @@ def deleteEvent (request,pk):
     event=Event.objects.get(id=pk)
     if request.method == 'POST':
         try:
-            event.delete()
             contract_event=sc.deploy_contract(event.address, abi, w3)
             sc.delete_event(contract_event,int(pk),w3)
+            event.delete()
         except:
             return redirect ('/tick/error/')
         return redirect ('/tick/manager/')
@@ -209,14 +217,18 @@ def buyTicket (request,pk):
     ticket= Event.objects.get(id=pk)
     if request.method == 'POST':
         try:
-            ticket.num_ticket-=1
-            ticket.save()
-           
-            contract_event=sc.deploy_contract(ticket.address, abi, w3)
-            contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
-            EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
-            ticket = sc.getTickets(contract_event, request.user.last_name)
-        except:
+            if ticket.num_ticket != 0:
+                contract_event=sc.deploy_contract(ticket.address, abi, w3)
+                contract_address =sc.buy_ticket(contract_event, request.user.last_name, w3)
+                #EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
+                ticket.address = contract_address
+                ticket.num_ticket-=1
+                ticket.save()
+                #ticket = sc.getTickets(contract_event, request.user.last_name)
+            else:
+                messages.error(request, 'No tickets available')
+        except Exception:
+            print(traceback.format_exc())
             return redirect ('/tick/error/')
         return redirect ('home')
     context={'ticket':ticket}  #'ticket' l'ho chiamato in confirm.html
@@ -276,7 +288,8 @@ def manageTicket(request,pk):
                     if t[2] == True:
                         t += (user.username, user.id, pk, )
                         tickets.append(t)
-    except:
+    except Exception:
+        print(traceback.format_exc())
         return redirect ('/tick/error/')
 
     context={'tickets': tickets, 'ticket':ticket, 'purchased_cinema':purchased_cinema, 'purchased_sport':purchased_sport,'purchased_teatro':purchased_teatro, 'purchased_concerti':purchased_concerti, 'purchased':purchased, 'total_purchased':total_purchased}
@@ -291,10 +304,8 @@ def manageBuy(request,pk):
     temp_tick = sc.getTickets(contract_deployed, request.user.last_name)
     tickets=[]
     for i,tick in enumerate(temp_tick):
-            tick+=(i,)
-            tickets.append(tick)
-
-
+        tick+=(i,)
+        tickets.append(tick)
 
     context= {'tickets':tickets ,'id_evento':pk,'id_user':request.user.id}
     return render(request,'tick/accounts/managebuy.html', context)
@@ -311,8 +322,8 @@ def invalidateTicket(request, pk, id_evento, id_user):
             event= Event.objects.get(id=id_evento)
             contract_deployed=sc.deploy_contract(event.address, abi, w3)
             contract_address =sc.invalidation(contract_deployed, user.last_name, int(pk), w3)
-            Event.objects.filter(pk=id_evento).update(address=contract_address)
-        except:
+        except Exception:
+            print(traceback.format_exc())
             return redirect ('/tick/error/')
         return redirect ('/tick/manage_ticket/' + id_evento + '/')
     
@@ -325,15 +336,19 @@ def refundTicket(request, pk, id_evento, id_user):
     item = (pk, id_evento, id_user, )
     
     if request.method == 'POST':
-        if 1==1:
+        try:
             event= Event.objects.get(id=id_evento)
             user= User.objects.get(id=id_user)
             contract_deployed=sc.deploy_contract(event.address, abi, w3)
-            contract_address =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
-            num_ticket=event.num_ticket+1
-            Event.objects.filter(pk=id_evento).update(address=contract_address,num_ticket=num_ticket)
-        #except:
-            #return redirect ('/tick/error/')
+            result =sc.refundTicket(contract_deployed, user.last_name, int(pk), w3)
+            if result:
+                num_ticket=event.num_ticket+1
+                Event.objects.filter(pk=id_evento).update(num_ticket=num_ticket)
+            else:
+                messages.error(request, 'No ticket to refund')
+        except Exception:
+            print(traceback.format_exc())
+            return redirect ('/tick/error/')
         return redirect ('/tick/managebuy/' + id_evento + '/')
     
     context = {'item': item}
