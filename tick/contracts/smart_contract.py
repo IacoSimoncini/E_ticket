@@ -103,9 +103,9 @@ def buy_ticket(contract_deployed,buyer, w3):
     return txn_receipt['to']
 
 def invalidation(contract_deployed,owner,relative_ID,w3):
-    deploy_txn =contract_deployed.functions.invalidation(owner,relative_ID).transact()
+    deploy_txn = contract_deployed.functions.invalidation(owner,relative_ID).transact()
     txn_receipt = w3.eth.wait_for_transaction_receipt(deploy_txn)
-    return txn_receipt['to']
+    return True
 
 def delete_event(contract_deployed,event_id,w3):
     deploy_txn=contract_deployed.functions.deleteEvent(event_id).transact()

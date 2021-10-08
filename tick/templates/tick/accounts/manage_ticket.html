@@ -9,10 +9,10 @@
 	<div class="col-md-5">
 <table class="table table-sm">
       <tr>
-        <th scope="col">Id_Evento</th>
+        <th scope="col">Id Ticket</th>
         <th scope="col">Nome</th>
         <th scope="col">Sigillo fiscale</th>
-        <th scope="col">Id_Utente</th>
+        <th scope="col">Id Utente</th>
       </tr>
       {% for i in tickets %}
       <tr>
@@ -25,6 +25,9 @@
       {% endfor %}
     </tbody>
   </table>
+  {% for message in messages %}
+  <p id="messages">{{message}}</p>
+  {% endfor %}
 
     </div>
 </div>

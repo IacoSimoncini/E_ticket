@@ -45,6 +45,12 @@ def userPage(request):
     events = Event.objects.all()
     total_events = events.count()
 
+    for e in events:
+        contract_deployed=sc.deploy_contract(e.address, abi, w3)
+        temp_tick = sc.getTickets(contract_deployed, request.user.last_name) 
+        if len(temp_tick) == 0:
+            events = events.exclude(id=e.id)
+
     film= events.filter(category='Cinema')
     sport= events.filter(category='Sport')
     teatro= events.filter(category='Teatro')
@@ -179,16 +185,11 @@ def updateEvent(request, pk):
             try:
                 evento = EventForm.Meta.model.objects.get(id=pk)
                 contract_event = sc.deploy_contract(evento.address, abi, w3)
-                sold_ticket = sc.getSoldTickets(contract_event)
-                reduction = evento.num_ticket - int(request.POST['num_ticket']) + sold_ticket
                 prezzo = float(request.POST['prezzo']) * 100
                 prezzo = int(prezzo)
-                if(reduction<=sc.getTicketAvaiable(contract_event)):
-                    contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],prezzo,w3)
-                    EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
-                    form.save()
-                else:
-                    messages.error(request, 'Too many places removed')
+                contract_address =sc.update_contract(contract_event,int(request.POST['num_ticket']),request.POST['nome'],request.POST['luogo'],prezzo,w3)
+                EventForm.Meta.model.objects.filter(pk=pk).update(address=contract_address)
+                form.save()
             except Exception:
                 print(traceback.format_exc())
                 return redirect ('/tick/error/')
@@ -325,7 +326,15 @@ def invalidateTicket(request, pk, id_evento, id_user):
         try:
             event= Event.objects.get(id=id_evento)
             contract_deployed=sc.deploy_contract(event.address, abi, w3)
-            contract_address =sc.invalidation(contract_deployed, user.last_name, int(pk), w3)
+            temp_tick = sc.getTickets(contract_deployed, user.last_name)
+            result = False
+            for i, tick in enumerate(temp_tick):
+                if tick[1] == int(pk) and tick[2] == True:
+                    result =sc.invalidation(contract_deployed, user.last_name, int(i), w3)
+                    break
+            if not result:
+                messages.error(request, 'Ticket has been invalidated yet')
+                return redirect ('/tick/manage_ticket/' + id_evento + '/')
         except Exception:
             print(traceback.format_exc())
             return redirect ('/tick/error/')
@@ -350,6 +359,7 @@ def refundTicket(request, pk, id_evento, id_user):
                 Event.objects.filter(pk=id_evento).update(num_ticket=num_ticket)
             else:
                 messages.error(request, 'No ticket to refund')
+                return redirect ('/tick/refund/' + pk + '/' + id_evento + '/' + id_user)
         except Exception:
             print(traceback.format_exc())
             return redirect ('/tick/error/')

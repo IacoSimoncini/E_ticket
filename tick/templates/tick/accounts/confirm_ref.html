@@ -8,8 +8,9 @@
     {% csrf_token %}
     <a class="btn btn-warning" href="{% url 'managebuy' item.1 %}">Cancel</a>
     <input class="btn btn-danger" type="submit" name="Confirm" value="Confirm">
-
 </form>
-
+{% for message in messages %}
+<p id="messages">{{message}}</p>
+{% endfor %}	
 </div>
 {% endblock %}

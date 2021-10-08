@@ -154,8 +154,11 @@ contract Event is Ownable{
     }
     
     function invalidation(address owner, uint256 relativeID) onlyOwner public returns(bool){
-        ticket[owner][relativeID].valid = false;
-        return true;
+        if (ticket[owner][relativeID].valid == true) {
+            ticket[owner][relativeID].valid = false;
+            return true;
+        }
+        return false;
     }
     
     function refundTicket(address owner,uint256 relativeID) public returns(bool){
