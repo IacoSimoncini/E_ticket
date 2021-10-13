@@ -30,13 +30,6 @@ può creare eliminare o modificare eventi
 utente: admin
 password: admin
 
-## Autori
-
-### Carletti Nicola  email: s1101135@studenti.univpm.it
-### Martino Pio Enrico  email: s1102862@studenti.univpm.it
-### Mezzotero Giulio  email: s1101006@studenti.univpm.it
-### Simoncini Iacopo  email: s1102874@studenti.univpm.it
-### Talento Francesco  email: s1102540@studenti.univpm.it
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page dell'admin dove può creare, modificare o eliminare un evento
 ### Reseller
 
@@ -63,3 +56,17 @@ Nel caso in cui si vogliano effettuare delle modifiche all'applicazione web, in 
 python manage.py makemigrations
 python manage.py migrate
 ```
+
+
+## Autori
+
+### Carletti Nicola  
+email: s1101135@studenti.univpm.it
+### Martino Pio Enrico  
+email: s1102862@studenti.univpm.it
+### Mezzotero Giulio  
+email: s1101006@studenti.univpm.it
+### Simoncini Iacopo  
+email: s1102874@studenti.univpm.it
+### Talento Francesco 
+email: s1102540@studenti.univpm.it
