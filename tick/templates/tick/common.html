@@ -98,7 +98,7 @@
 		{% if request.user.is_authenticated and not request.user.username == 'reseller' and not request.user.is_staff %}
         <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
 		{% endif %}
-		{% if request.user.is_authenticated and request.user.username == 'reseller' %}
+		{% if request.user.is_authenticated and request.user.username == 'invalidator' %}
         <a  href="{% url 'reseller-page' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
 		{% endif %}
 		{% if request.user.is_authenticated and request.user.is_staff %}
