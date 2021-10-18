@@ -95,7 +95,7 @@
 		{% if request.user.is_anonymous %}
         <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
 		{% endif %}
-		{% if request.user.is_authenticated and not request.user.username == 'reseller' and not request.user.is_staff %}
+		{% if request.user.is_authenticated and not request.user.username == 'invalidator' and not request.user.is_staff %}
         <a  href="{% url 'home' %}"><img src="{% static 'tick/logo_cut.jpg' %}" alt="" width="80" height=""></a>
 		{% endif %}
 		{% if request.user.is_authenticated and request.user.username == 'invalidator' %}
