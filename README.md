@@ -36,6 +36,7 @@ può creare eliminare o modificare eventi
 
 
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page dell'admin dove può creare, modificare o eliminare un evento
+<<<<<<< HEAD
 
 ### Reseller
 
@@ -48,23 +49,21 @@ può invalidare i biglietti
 
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page del reseller dove può invalidare il biglietto
 
+=======
+### Invalidator
+
+può invalidare i biglietti
+utente: invalidator
+password: inval123
+
+Sia il bottone giallo che il bottone blu permettono di accedere alla home page dell'invalidator dove può invalidare il biglietto
+>>>>>>> 8595fab0a89579f8dfecfd4496c248f27c427f1f
 ### Cliente
 
 può comprare o chiedere il rimborso dei biglietti
 
 Il bottone giallo permette di accedere alla home page dell'utente dove può acquistare dei biglietti
 Il bottone blu permette di accedere alla pagina contenente la lista degli eventi per i quali l'utente ha comprato il biglietto, da qui potrà vedere i biglietti acquisiti per un evento e, se lo desidera, richiedere il rimborso
-
-
-## Personalizzazione del sito
-
-Nel caso in cui si vogliano effettuare delle modifiche all'applicazione web, in special modo nella struttura del database, vengono qui lasciati i comandi per effettuare la migrazione
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
 
 ## Autori
 
