@@ -21,28 +21,36 @@ python manage.py runserver
 
 ## Interazioni
 
-Per utilizzare l'applicazione web si possono utilizzare i profili di prova qui messi a disposizione, se ne potranno creare altri in seguito, ma con accesso limitato alle sole funzioni di cliente (acquisto/rimborso biglietto).
-Per muoversi all'interno del sito si possono premere i vari bottoni che permettono di accedere alle pagine preposte allo svolgimento delle varie operazioni richieste. Inoltre sono presenti due bottoni speciali (uno giallo con la scritta "E_Ticket" in alto a sinistra e uno blu col nome dell'utente in alto a destra) che a seconda del tipo di utente permettono di accedere a diffferenti pagine
+Per utilizzare l'applicazione web con privilegi superiori a quelli dell'utente di tipo cliente si possono utilizzare i profili qui messi a disposizione. Profili di tipo cliente si possono creare in ogni momento tramite la pagina di registrazione.
+Per muoversi all'interno del sito si possono premere i vari bottoni che permettono di accedere alle pagine preposte allo svolgimento delle varie operazioni richieste. Inoltre sono presenti due bottoni speciali (uno giallo con la scritta "E_Ticket" in alto a sinistra e uno blu col nome dell'utente in alto a destra) che a seconda del tipo di utente permettono di accedere a diffferenti pagine.
+
+Questi sono i livelli di utente presenti nell'applicazione web:
 
 ### Amministratore 
 
-può creare eliminare o modificare eventi
+Credenziali d'accesso:
 utente: admin
 password: admin
 
+può creare eliminare o modificare eventi
+
+
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page dell'admin dove può creare, modificare o eliminare un evento
+
 ### Reseller
 
-può invalidare i biglietti
+Credenziali d'accesso:
 utente: reseller
 password: resel123
 
+può invalidare i biglietti
+
+
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page del reseller dove può invalidare il biglietto
+
 ### Cliente
 
 può comprare o chiedere il rimborso dei biglietti
-utente: Utente1
-password: cybersecurity
 
 Il bottone giallo permette di accedere alla home page dell'utente dove può acquistare dei biglietti
 Il bottone blu permette di accedere alla pagina contenente la lista degli eventi per i quali l'utente ha comprato il biglietto, da qui potrà vedere i biglietti acquisiti per un evento e, se lo desidera, richiedere il rimborso
