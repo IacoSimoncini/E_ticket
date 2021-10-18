@@ -29,7 +29,9 @@ Questi sono i livelli di utente presenti nell'applicazione web:
 ### Amministratore 
 
 Credenziali d'accesso:
+
 utente: admin
+
 password: admin
 
 può creare eliminare o modificare eventi
@@ -40,7 +42,9 @@ Sia il bottone giallo che il bottone blu permettono di accedere alla home page d
 ### Invalidator
 
 può invalidare i biglietti
+
 utente: invalidator
+
 password: inval123
 
 Sia il bottone giallo che il bottone blu permettono di accedere alla home page dell'invalidator dove può invalidare il biglietto
